@@ -1,9 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// Official IBM WatsonX SDK import
-// import { WatsonXAI } from '@ibm-cloud/watsonx-ai'; 
-// import { IamAuthenticator } from 'ibm-cloud-sdk-core';
+import { WatsonXAI } from '@ibm-cloud/watsonx-ai'; 
+import { IamAuthenticator } from 'ibm-cloud-sdk-core';
 
 dotenv.config();
 
@@ -25,28 +24,26 @@ app.post('/api/chat', async (req, res) => {
 
   // 2. Setup WatsonX API interaction
   try {
-    /* 
-    TODO: Initialize the WatsonX AI client with proper keys once configured
-    
     const watsonx = WatsonXAI.newInstance({
       version: '2023-05-29',
       authenticator: new IamAuthenticator({ apikey: process.env.IBM_CLOUD_API_KEY })
     });
     
+    // Construct prompt
+    const promptText = `You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
+Analyze the user's practice log and provide brief, encouraging, coaching-style feedback to help them improve.
+
+Practice Log: ${message}
+Bob's Feedback:`;
+
     const response = await watsonx.generateText({
       projectId: process.env.IBM_PROJECT_ID,
-      modelId: 'ibm/granite-13b-chat-v2', // or any other capable model
-      input: message,
-      parameters: { maxNewTokens: 200 }
+      modelId: 'ibm/granite-13b-chat-v2', 
+      input: promptText,
+      parameters: { max_new_tokens: 200 }
     });
 
-    return res.json({ text: response.results[0].generatedText });
-    */
-
-    // Placeholder until the SDK is uncommented
-    res.json({
-      text: "WatsonX is connected! Bob says: Keep up the great practice!"
-    });
+    res.json({ text: response.result.results[0].generated_text });
 
   } catch (error) {
     console.error('Error calling WatsonX:', error);

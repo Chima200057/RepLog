@@ -30,15 +30,28 @@ function App() {
     setInputVal('');
     setIsTyping(true);
 
-    // Mock Backend / WatsonX API request delay
-    setTimeout(() => {
-      setIsTyping(false);
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage.text })
+      });
+      const data = await response.json();
+      
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'bot',
-        text: 'That sounds like solid progress for a practice log! In the mean time, I am waiting for the Express backend to be wired up to IBM watsonx.ai so I can give you real analysis.'
+        text: data.text || 'Error connecting to Bob.'
       }]);
-    }, 1500);
+    } catch (err) {
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        role: 'bot',
+        text: 'Failed to reach the server. Make sure you are running `node server/index.js` in a second terminal!'
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const features = [

@@ -47,12 +47,12 @@ function App() {
   });
 
   // -- SESSION MANAGEMENT --
-  const [sessions, setSessions] = useState(() => {
+  const [activePageId, setActivePageId] = useState(() => {
     const savedUser = localStorage.getItem('replog_user');
     const userObj = savedUser ? JSON.parse(savedUser) : null;
-    if (!userObj) return []; // Don't persist sessions for guests
-    const saved = localStorage.getItem('replog_sessions');
-    return saved ? JSON.parse(saved) : [];
+    if (!userObj) return 101;
+    const saved = localStorage.getItem(`replog_active_page_${userObj.email}`);
+    return saved ? JSON.parse(saved) : 101;
   });
   
   const [currentSessionId, setCurrentSessionId] = useState(null);
@@ -63,8 +63,8 @@ function App() {
   const [notebooks, setNotebooks] = useState(() => {
     const savedUser = localStorage.getItem('replog_user');
     const userObj = savedUser ? JSON.parse(savedUser) : null;
-    if (!userObj) return DEFAULT_NOTEBOOKS; // Always use defaults for guests
-    const saved = localStorage.getItem('replog_notebooks');
+    if (!userObj) return DEFAULT_NOTEBOOKS;
+    const saved = localStorage.getItem(`replog_notebooks_${userObj.email}`);
     return saved ? JSON.parse(saved) : DEFAULT_NOTEBOOKS;
   });
   
@@ -85,9 +85,7 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('replog_sessions', JSON.stringify(sessions));
-    } else {
-      localStorage.removeItem('replog_sessions');
+      localStorage.setItem(`replog_sessions_${user.email}`, JSON.stringify(sessions));
     }
   }, [sessions, user]);
 
@@ -102,15 +100,13 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('replog_notebooks', JSON.stringify(notebooks));
-    } else {
-      localStorage.removeItem('replog_notebooks');
+      localStorage.setItem(`replog_notebooks_${user.email}`, JSON.stringify(notebooks));
     }
   }, [notebooks, user]);
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('replog_active_page', JSON.stringify(activePageId));
+      localStorage.setItem(`replog_active_page_${user.email}`, JSON.stringify(activePageId));
     }
   }, [activePageId, user]);
 
@@ -151,9 +147,9 @@ function App() {
     setNotebooks(DEFAULT_NOTEBOOKS);
     setActivePageId(101);
     setGuestChatCount(0);
-    localStorage.removeItem('replog_sessions');
+    // Don't remove user-specific data from local storage, just clear the current user pointer
+    localStorage.removeItem('replog_user');
     localStorage.removeItem('replog_chat');
-    localStorage.removeItem('replog_notebooks');
     localStorage.removeItem('replog_active_page');
   };
 
@@ -489,11 +485,14 @@ function App() {
           onClose={() => setIsAuthOpen(false)}
           onLogin={(userData) => {
             setUser(userData);
-            // Atomically load user data to prevent overwriting with guest defaults
-            const savedSessions = localStorage.getItem('replog_sessions');
+            // Atomically load user-scoped data to prevent overwriting with guest defaults
+            const savedSessions = localStorage.getItem(`replog_sessions_${userData.email}`);
             if (savedSessions) setSessions(JSON.parse(savedSessions));
-            const savedNotebooks = localStorage.getItem('replog_notebooks');
+            else setSessions([]);
+
+            const savedNotebooks = localStorage.getItem(`replog_notebooks_${userData.email}`);
             if (savedNotebooks) setNotebooks(JSON.parse(savedNotebooks));
+            else setNotebooks(DEFAULT_NOTEBOOKS);
           }}
           onSignup={(userData) => {
             setUser(userData);

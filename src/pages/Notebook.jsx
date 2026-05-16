@@ -472,13 +472,32 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
       });
   };
 
-  const filteredNotebooks = notebooks.map(nb => ({
-    ...nb,
-    pages: nb.pages.filter(p =>
-      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.content.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter(nb => !searchQuery || nb.pages.length > 0);
+  const filteredNotebooks = notebooks.map(nb => {
+    if (!searchQuery) return nb;
+
+    const query = searchQuery.toLowerCase();
+    const matchingIds = new Set();
+
+    nb.pages.forEach(p => {
+      if (
+        p.title.toLowerCase().includes(query) ||
+        p.content.toLowerCase().includes(query)
+      ) {
+        matchingIds.add(p.id);
+        // Walk up the tree to include all parent pages
+        let current = p;
+        while (current && current.parentId) {
+          matchingIds.add(current.parentId);
+          current = nb.pages.find(x => x.id === current.parentId);
+        }
+      }
+    });
+
+    return {
+      ...nb,
+      pages: nb.pages.filter(p => matchingIds.has(p.id)),
+    };
+  }).filter(nb => !searchQuery || nb.pages.length > 0);
 
   return (
     <div

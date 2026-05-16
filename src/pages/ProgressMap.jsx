@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { BookOpen, List, Map, Send, X, FileText, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import Notebook from './Notebook';
-import './PracticeMap.css';
+import './ProgressMap.css';
 
 // ─── Physics tuning ───────────────────────────────────────────────
 const LINK_REST     = 160;

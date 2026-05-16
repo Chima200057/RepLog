@@ -14,7 +14,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   const [collapsedPages, setCollapsedPages] = useState({});
   const [dragState, setDragState] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
-  const [isPracticeMapOpen, setIsPracticeMapOpen] = useState(false);
+  const [isNotesDashboardOpen, setIsNotesDashboardOpen] = useState(false);
   const renameRef = useRef(null);
   const dragNodeRef = useRef(null);
 
@@ -489,8 +489,8 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
           </div>
           <div className="nb-header-actions">
             <button
-              className="nb-icon-btn practice-map-btn"
-              onClick={() => setIsPracticeMapOpen(true)}
+              className="nb-icon-btn notes-dashboard-btn"
+              onClick={() => setIsNotesDashboardOpen(true)}
               title="Open Notes Dashboard"
             >
               <LayoutDashboard size={16} />
@@ -618,8 +618,8 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
       </main>
 
       <NotesDashboard
-        isOpen={isPracticeMapOpen}
-        onClose={() => setIsPracticeMapOpen(false)}
+        isOpen={isNotesDashboardOpen}
+        onClose={() => setIsNotesDashboardOpen(false)}
         notebooks={notebooks}
         setNotebooks={setNotebooks}
         setActivePageId={setActivePageId}

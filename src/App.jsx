@@ -148,9 +148,13 @@ function App() {
     setUser(null);
     setCurrentSessionId(null);
     setSessions([]);
+    setNotebooks(DEFAULT_NOTEBOOKS);
+    setActivePageId(101);
     setGuestChatCount(0);
     localStorage.removeItem('replog_sessions');
     localStorage.removeItem('replog_chat');
+    localStorage.removeItem('replog_notebooks');
+    localStorage.removeItem('replog_active_page');
   };
 
   const scrollToBottom = () => {
@@ -483,8 +487,19 @@ function App() {
         <AuthModal 
           isOpen={isAuthOpen} 
           onClose={() => setIsAuthOpen(false)}
-          onLogin={(userData) => setUser(userData)}
-          onSignup={(userData) => setUser(userData)}
+          onLogin={(userData) => {
+            setUser(userData);
+            // Atomically load user data to prevent overwriting with guest defaults
+            const savedSessions = localStorage.getItem('replog_sessions');
+            if (savedSessions) setSessions(JSON.parse(savedSessions));
+            const savedNotebooks = localStorage.getItem('replog_notebooks');
+            if (savedNotebooks) setNotebooks(JSON.parse(savedNotebooks));
+          }}
+          onSignup={(userData) => {
+            setUser(userData);
+            setSessions([]);
+            setNotebooks(DEFAULT_NOTEBOOKS);
+          }}
         />
       </div>
     </BrowserRouter>

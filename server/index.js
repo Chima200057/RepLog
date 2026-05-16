@@ -59,41 +59,42 @@ Practice Log: ${message}
       modelId: 'ibm/granite-3-8b-instruct', 
       input: promptText,
       parameters: { 
-        max_new_tokens: 500,
+        max_new_tokens: 900,
         stop_sequences: ['<|user|>', '<|system|>'] 
       }
     });
 
-    let rawText = response.result.results[0].generated_text.trim();
-    let parsed = { text: rawText, title: "Bob's Advice" };
+    const rawText = response.result.results[0].generated_text.trim();
+    let parsed = { title: "Bob's Feedback", text: rawText };
 
-    // Robust JSON search
-    const startBracket = rawText.indexOf('{');
-    const endBracket = rawText.lastIndexOf('}');
-    
-    if (startBracket !== -1 && endBracket !== -1 && endBracket > startBracket) {
-      try {
-        const potentialJson = rawText.substring(startBracket, endBracket + 1);
-        const jsonData = JSON.parse(potentialJson);
-        if (jsonData.text) {
+    try {
+      // 1. Try standard parse
+      parsed = JSON.parse(rawText);
+    } catch (e) {
+      // 2. Try regex-based extraction for JSON blocks
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          parsed = JSON.parse(jsonMatch[0]);
+        } catch (e2) {
+          // 3. Fallback: Manually extract text if JSON is truncated
+          const textMatch = rawText.match(/"text":\s*"([\s\S]*)"/);
+          const titleMatch = rawText.match(/"title":\s*"([^"]*)"/);
+          
           parsed = {
-            text: jsonData.text,
-            title: jsonData.title || "Bob's Advice"
+            title: titleMatch ? titleMatch[1] : "Bob's Feedback",
+            text: textMatch ? textMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : rawText
           };
         }
-      } catch (e) {
-        console.warn("JSON block found but invalid, using raw text cleanup.");
       }
     }
 
-    // Cleanup logic if fallback is used
-    if (parsed.text === rawText) {
-      const stopSequences = ['User:', "Bob's Feedback:", 'Analyze the user\'s', '<|system|>', '<|user|>', '<|assistant|>'];
-      stopSequences.forEach(seq => {
-        const index = parsed.text.indexOf(seq);
-        if (index !== -1) parsed.text = parsed.text.substring(0, index).trim();
-      });
-    }
+    // Secondary cleanup to strip AI "leakage"
+    const stopSequences = ['User:', "Bob's Feedback:", 'Analyze the user\'s', '<|system|>', '<|user|>', '<|assistant|>'];
+    stopSequences.forEach(seq => {
+      const index = parsed.text.indexOf(seq);
+      if (index !== -1) parsed.text = parsed.text.substring(0, index).trim();
+    });
 
     res.json(parsed);
 

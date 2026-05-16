@@ -48,6 +48,9 @@ function App() {
 
   // -- SESSION MANAGEMENT --
   const [sessions, setSessions] = useState(() => {
+    const savedUser = localStorage.getItem('replog_user');
+    const userObj = savedUser ? JSON.parse(savedUser) : null;
+    if (!userObj) return []; // Don't persist sessions for guests
     const saved = localStorage.getItem('replog_sessions');
     return saved ? JSON.parse(saved) : [];
   });
@@ -58,6 +61,9 @@ function App() {
   const [pendingCards, setPendingCards] = useState([]); 
   
   const [notebooks, setNotebooks] = useState(() => {
+    const savedUser = localStorage.getItem('replog_user');
+    const userObj = savedUser ? JSON.parse(savedUser) : null;
+    if (!userObj) return DEFAULT_NOTEBOOKS; // Always use defaults for guests
     const saved = localStorage.getItem('replog_notebooks');
     return saved ? JSON.parse(saved) : DEFAULT_NOTEBOOKS;
   });
@@ -78,8 +84,12 @@ function App() {
   }, [user, guestChatCount]);
 
   useEffect(() => {
-    localStorage.setItem('replog_sessions', JSON.stringify(sessions));
-  }, [sessions]);
+    if (user) {
+      localStorage.setItem('replog_sessions', JSON.stringify(sessions));
+    } else {
+      localStorage.removeItem('replog_sessions');
+    }
+  }, [sessions, user]);
 
   useEffect(() => {
     if (currentSessionId) {
@@ -91,12 +101,18 @@ function App() {
   }, [currentSessionId, sessions]);
 
   useEffect(() => {
-    localStorage.setItem('replog_notebooks', JSON.stringify(notebooks));
-  }, [notebooks]);
+    if (user) {
+      localStorage.setItem('replog_notebooks', JSON.stringify(notebooks));
+    } else {
+      localStorage.removeItem('replog_notebooks');
+    }
+  }, [notebooks, user]);
 
   useEffect(() => {
-    localStorage.setItem('replog_active_page', JSON.stringify(activePageId));
-  }, [activePageId]);
+    if (user) {
+      localStorage.setItem('replog_active_page', JSON.stringify(activePageId));
+    }
+  }, [activePageId, user]);
 
   const startNewChat = () => {
     const newId = Date.now();
@@ -288,6 +304,7 @@ function App() {
             setNotebooks={setNotebooks} 
             activePageId={activePageId} 
             setActivePageId={setActivePageId} 
+            isGuest={!user}
           />} />
           <Route path="/about" element={<About />} />
         </Routes>

@@ -26,7 +26,7 @@ const DEFAULT_NOTEBOOKS = [
   },
 ];
 
-export default function Notebook({ notebooks, setNotebooks, activePageId, setActivePageId }) {
+export default function Notebook({ notebooks, setNotebooks, activePageId, setActivePageId, isGuest }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [renamingId, setRenamingId] = useState(null);
@@ -42,6 +42,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   }, [renamingId]);
 
   const addNotebook = () => {
+    if (isGuest) return;
     const id = Date.now();
     setNotebooks(prev => [...prev, { id, name: 'New Notebook', expanded: true, pages: [] }]);
     setRenamingId(id);
@@ -55,10 +56,12 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   };
 
   const deleteNotebook = (id) => {
+    if (isGuest) return;
     setNotebooks(prev => prev.filter(nb => nb.id !== id));
   };
 
   const addPage = (notebookId) => {
+    if (isGuest) return;
     const pageId = Date.now();
     const newPage = { id: pageId, title: 'Untitled', content: '' };
     setNotebooks(prev =>
@@ -85,6 +88,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   };
 
   const updatePageContent = (content) => {
+    if (isGuest) return;
     setNotebooks(prev =>
       prev.map(nb => ({
         ...nb,
@@ -173,12 +177,16 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
                 )}
 
                 <div className="nb-group-actions">
-                  <button className="nb-icon-btn" title="Add page" onClick={() => addPage(nb.id)}>
-                    <Plus size={13} />
-                  </button>
-                  <button className="nb-icon-btn danger" title="Delete notebook" onClick={() => deleteNotebook(nb.id)}>
-                    <Trash2 size={13} />
-                  </button>
+                  {!isGuest && (
+                    <>
+                      <button className="nb-icon-btn" title="Add page" onClick={() => addPage(nb.id)}>
+                        <Plus size={13} />
+                      </button>
+                      <button className="nb-icon-btn danger" title="Delete notebook" onClick={() => deleteNotebook(nb.id)}>
+                        <Trash2 size={13} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -211,17 +219,24 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
                           onClick={e => e.stopPropagation()}
                         />
                       ) : (
-                        <span onDoubleClick={(e) => { e.stopPropagation(); setRenamingId(page.id); setRenameValue(page.title); }}>
+                        <span onDoubleClick={(e) => { 
+                          if (isGuest) return;
+                          e.stopPropagation(); 
+                          setRenamingId(page.id); 
+                          setRenameValue(page.title); 
+                        }}>
                           {page.title}
                         </span>
                       )}
-                      <button
-                        className="nb-icon-btn danger page-delete"
-                        title="Delete page"
-                        onClick={e => { e.stopPropagation(); deletePage(nb.id, page.id); }}
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                      {!isGuest && (
+                        <button
+                          className="nb-icon-btn danger page-delete"
+                          title="Delete page"
+                          onClick={e => { e.stopPropagation(); deletePage(nb.id, page.id); }}
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
                     </div>
                   ))}
                   {nb.pages.length === 0 && (
@@ -233,10 +248,12 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
           ))}
         </div>
 
-        <button className="nb-add-notebook" onClick={addNotebook}>
-          <Plus size={14} />
-          New Notebook
-        </button>
+        {!isGuest && (
+          <button className="nb-add-notebook" onClick={addNotebook}>
+            <Plus size={14} />
+            New Notebook
+          </button>
+        )}
       </aside>
 
       <main className="nb-editor">
@@ -248,20 +265,28 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
 
         {activePage ? (
           <>
+            {isGuest && (
+              <div className="nb-guest-banner">
+                <BookOpen size={14} />
+                <span>Guest Preview Mode: Sign in to create and edit notes.</span>
+              </div>
+            )}
             <div className="nb-editor-header">
               <input
                 className="nb-page-title-input"
                 value={activePage.title}
                 onChange={e => updatePageTitle(activePageId, e.target.value)}
                 placeholder="Untitled"
+                disabled={isGuest}
               />
             </div>
             <textarea
-              className="nb-editor-body"
+              className={`nb-editor-body ${isGuest ? 'disabled' : ''}`}
               value={activePage.content}
               onChange={e => updatePageContent(e.target.value)}
               placeholder="Start writing... (Markdown supported)"
               spellCheck={false}
+              readOnly={isGuest}
             />
           </>
         ) : (

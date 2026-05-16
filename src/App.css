@@ -183,9 +183,134 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 768px) {
+/* How it works Section */
+.how-it-works {
+  padding: 5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-header h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #fff, #a1a1a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-header p {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.hiw-pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1100px;
+  gap: 1.5rem;
+}
+
+.hiw-step {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  position: relative;
+  backdrop-filter: blur(12px);
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hiw-step:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 40px rgba(191, 64, 255, 0.15);
+}
+
+.step-number {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba(191, 64, 255, 0.3);
+}
+
+.step-content h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.step-content p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.step-content code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #ff91e4;
+}
+
+.hiw-connector {
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--glass-border), rgba(191, 64, 255, 0.5));
+  position: relative;
+}
+
+.hiw-connector::after {
+  content: '>';
+  position: absolute;
+  right: -10px;
+  top: -12px;
+  color: rgba(191, 64, 255, 0.5);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 900px) {
   .hero h1 { font-size: 3rem; }
   .navbar { padding: 1.5rem 2rem; }
   .nav-links { display: none; }
-  .features { padding: 3rem 2rem; }
+  .features, .how-it-works { padding: 3rem 2rem; }
+  
+  .hiw-pipeline {
+    flex-direction: column;
+  }
+  
+  .hiw-connector {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, var(--glass-border), rgba(191, 64, 255, 0.5));
+  }
+  
+  .hiw-connector::after {
+    content: 'v';
+    bottom: -15px;
+    right: -4px;
+    top: auto;
+  }
 }

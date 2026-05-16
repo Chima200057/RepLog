@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   BookOpen, Plus, Trash2, ChevronRight, ChevronDown,
-  FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft, Map
+  FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft, LayoutDashboard
 } from 'lucide-react';
 import NotesDashboard from '../components/NotesDashboard';
 import './Notebook.css';
@@ -493,7 +493,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
               onClick={() => setIsPracticeMapOpen(true)}
               title="Open Notes Dashboard"
             >
-              <Map size={16} />
+              <LayoutDashboard size={16} />
             </button>
             <button className="nb-icon-btn" onClick={() => setSidebarOpen(false)} title="Close sidebar">
               <X size={16} />

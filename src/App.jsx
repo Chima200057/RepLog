@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Bot } from 'lucide-react'
+import { MessageCircle, X, Send, Bot, LogIn, LogOut, User, RefreshCw, MessageSquare, History, Save } from 'lucide-react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/HowItWorks'
 import About from './pages/About'
-import './App.css'
-import './Chat.css'
-import Notebook from './pages/Notebook';
+import Notebook from './pages/Notebook'
+import AuthModal from './components/AuthModal'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Save } from 'lucide-react'
+import './App.css'
+import './Chat.css'
 
 const DEFAULT_NOTEBOOKS = [
   {
@@ -34,15 +34,26 @@ const DEFAULT_NOTEBOOKS = [
 function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [inputVal, setInputVal] = useState('');
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   
-  // Persistence: Load from localStorage
-  const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem('replog_chat');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, role: 'bot', text: 'Hey there! I am Bob, your AI coach. How was your practice session today?', canSave: false }
-    ];
+  // -- USER & AUTH STATE --
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('replog_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [guestChatCount, setGuestChatCount] = useState(() => {
+    return parseInt(localStorage.getItem('replog_guest_count') || '0');
+  });
+
+  // -- SESSION MANAGEMENT --
+  const [sessions, setSessions] = useState(() => {
+    const saved = localStorage.getItem('replog_sessions');
+    return saved ? JSON.parse(saved) : [];
   });
   
+  const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [pendingCards, setPendingCards] = useState([]); 
   
@@ -58,10 +69,26 @@ function App() {
 
   const messagesEndRef = useRef(null);
 
-  // Sync to local storage
+  // Sync states to local storage
   useEffect(() => {
-    localStorage.setItem('replog_chat', JSON.stringify(messages));
-  }, [messages]);
+    localStorage.setItem('replog_user', JSON.stringify(user));
+    if (!user) {
+      localStorage.setItem('replog_guest_count', guestChatCount.toString());
+    }
+  }, [user, guestChatCount]);
+
+  useEffect(() => {
+    localStorage.setItem('replog_sessions', JSON.stringify(sessions));
+  }, [sessions]);
+
+  useEffect(() => {
+    if (currentSessionId) {
+      const activeSession = sessions.find(s => s.id === currentSessionId);
+      if (activeSession) setMessages(activeSession.messages);
+    } else {
+      setMessages([]);
+    }
+  }, [currentSessionId, sessions]);
 
   useEffect(() => {
     localStorage.setItem('replog_notebooks', JSON.stringify(notebooks));
@@ -70,6 +97,37 @@ function App() {
   useEffect(() => {
     localStorage.setItem('replog_active_page', JSON.stringify(activePageId));
   }, [activePageId]);
+
+  const startNewChat = () => {
+    const newId = Date.now();
+    const welcomeMsg = { 
+      id: 1, 
+      role: 'bot', 
+      text: 'Hey there! I am Bob, your AI coach. How was your practice session today?', 
+      canSave: false 
+    };
+    const newSession = {
+      id: newId,
+      title: 'New Coaching Session',
+      timestamp: new Date().toISOString(),
+      messages: [welcomeMsg]
+    };
+    setSessions([newSession, ...sessions]);
+    setCurrentSessionId(newId);
+  };
+
+  const resumeChat = (id) => {
+    setCurrentSessionId(id);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentSessionId(null);
+    setSessions([]);
+    setGuestChatCount(0);
+    localStorage.removeItem('replog_sessions');
+    localStorage.removeItem('replog_chat');
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -83,56 +141,80 @@ function App() {
     e.preventDefault();
     if (!inputVal.trim() && pendingCards.length === 0) return;
 
-    // Build combined message for Bob
+    if (!user && guestChatCount >= 3) {
+      alert("You've reached your 3-chat limit as a guest! Please sign up to continue your coaching with Bob.");
+      setIsAuthOpen(true);
+      return;
+    }
+
+    const userText = inputVal;
+    setInputVal('');
+
     let combinedText = '';
     if (pendingCards.length > 0) {
       combinedText += pendingCards
         .map(c => `Note: "${c.title}"\n${c.content}`)
         .join('\n\n---\n\n');
     }
-    if (inputVal.trim()) {
-      combinedText += (combinedText ? '\n\n' : '') + inputVal.trim();
+    if (userText.trim()) {
+      combinedText += (combinedText ? '\n\n' : '') + userText.trim();
     }
 
-    // What the user sees in chat
-    const userMessage = {
-      id: Date.now(),
-      role: 'user',
+    const newUserMsg = { 
+      id: Date.now(), 
+      role: 'user', 
+      text: userText,
       type: pendingCards.length > 0 ? 'note-card-message' : 'text',
-      text: inputVal.trim(),
-      cards: [...pendingCards],
+      cards: [...pendingCards]
     };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputVal('');
+    
+    const updatedMessages = [...messages, newUserMsg];
+    
+    setSessions(prev => prev.map(s => 
+      s.id === currentSessionId ? { ...s, messages: updatedMessages } : s
+    ));
+    
+    if (!user) setGuestChatCount(prev => prev + 1);
     setPendingCards([]);
     setIsTyping(true);
 
     try {
-      // Send last 5 messages for context
-      const history = messages.slice(-5).map(m => ({ role: m.role, text: m.text }));
+      const history = updatedMessages.slice(-5).map(m => ({ role: m.role, text: m.text }));
 
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: combinedText,
-          history: history
-        })
+        body: JSON.stringify({ message: combinedText, history })
       });
       const data = await response.json();
-      setMessages(prev => [...prev, {
+      
+      const newBotMsg = {
         id: Date.now() + 1,
         role: 'bot',
         text: data.text || 'Error connecting to Bob.',
         title: data.title || "Bob's Advice"
-      }]);
+      };
+
+      const finalMessages = [...updatedMessages, newBotMsg];
+      
+      setSessions(prev => prev.map(s => 
+        s.id === currentSessionId 
+          ? { 
+              ...s, 
+              messages: finalMessages, 
+              title: s.messages.length <= 2 ? (data.title || s.title) : s.title 
+            } 
+          : s
+      ));
     } catch (err) {
-      setMessages(prev => [...prev, {
+      const errorMsg = {
         id: Date.now() + 1,
         role: 'bot',
         text: 'Failed to reach the server. Make sure you are running `node server/index.js` in a second terminal!'
-      }]);
+      };
+      setSessions(prev => prev.map(s => 
+        s.id === currentSessionId ? { ...s, messages: [...s.messages, errorMsg] } : s
+      ));
     } finally {
       setIsTyping(false);
     }
@@ -157,28 +239,16 @@ function App() {
     }]);
   };
 
-  const removePendingCard = (id) => {
-    setPendingCards(prev => prev.filter(c => c.id !== id));
-  };
-
   const saveToNotebook = (text, customTitle) => {
     const pageId = Date.now();
     const displayTitle = customTitle 
       ? `${customTitle} (${new Date().toLocaleDateString()})`
       : `Bob's Advice (${new Date().toLocaleDateString()})`;
 
-    const newPage = { 
-      id: pageId, 
-      title: displayTitle, 
-      content: text 
-    };
+    const newPage = { id: pageId, title: displayTitle, content: text };
     
     setNotebooks(prev =>
-      prev.map(nb =>
-        nb.id === 1 // Personal notebook
-          ? { ...nb, expanded: true, pages: [...nb.pages, newPage] }
-          : nb
-      )
+      prev.map(nb => nb.id === 1 ? { ...nb, expanded: true, pages: [...nb.pages, newPage] } : nb)
     );
     setActivePageId(pageId);
     alert('Advice saved to your Personal notebook!');
@@ -194,7 +264,20 @@ function App() {
             <Link to="/how-it-works">How it Works</Link>
             <Link to="/about">About IBM Bob</Link>
           </div>
-          <button className="btn-primary" onClick={() => setIsChatOpen(true)}>Get Started</button>
+          
+          <div className="nav-auth">
+            {user ? (
+              <div className="user-profile">
+                <span className="user-name"><User size={16} /> {user.name}</span>
+                <button className="btn-secondary" onClick={handleLogout}><LogOut size={16} /> Logout</button>
+              </div>
+            ) : (
+              <>
+                <button className="btn-primary" onClick={() => setIsAuthOpen(true)}><LogIn size={16} /> Sign In</button>
+                <button className="btn-primary" onClick={() => setIsChatOpen(true)}>Get Started</button>
+              </>
+            )}
+          </div>
         </nav>
 
         <Routes>
@@ -230,95 +313,137 @@ function App() {
           </div>
 
           <div className="chat-body">
-            {messages.map((msg) => (
-              msg.type === 'note-card-message' ? (
-                <div key={msg.id} className="message user note-card-message">
-                  {msg.cards.map((card, i) => (
-                    <div key={i} className="note-card-bubble">
-                      <span className="note-card-icon">📄</span>
-                      <div className="note-card-info">
-                        <span className="note-card-title">{card.title}</span>
-                        <span className="note-card-preview">{card.preview}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {msg.text && <p className="note-card-user-text">{msg.text}</p>}
+            {!user && (
+              <div className="guest-warning">
+                <div className="guest-warning-content">
+                  <strong>Guest Mode:</strong> {3 - guestChatCount} chats remaining. 
+                  <span>Register to save notes permanently!</span>
                 </div>
-              ) : (
-                <div key={msg.id} className={`message ${msg.role}`}>
-                  {msg.role === 'bot' ? (
-                    <>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-                      {msg.canSave !== false && (
-                        <button 
-                          className="save-advice-btn"
-                          onClick={() => saveToNotebook(msg.text, msg.title)}
-                          title="Save to Notebook"
-                        >
-                          <Save size={14} /> Save to Notebook
-                        </button>
-                      )}
-                    </>
-                  ) : (
-                    msg.text
+              </div>
+            )}
+
+            {!currentSessionId ? (
+              <div className="session-selector">
+                <div className="session-selector-header">
+                  <MessageSquare size={32} />
+                  <h3>Coaching Sessions</h3>
+                  <p>Pick up where you left off or start fresh.</p>
+                </div>
+
+                <div className="session-options">
+                  <button className="new-session-btn" onClick={startNewChat}>
+                    <RefreshCw size={18} />
+                    <span>Start New Session</span>
+                  </button>
+
+                  {sessions.length > 0 && (
+                    <div className="previous-sessions">
+                      <h4><History size={14} /> Previous Conversations</h4>
+                      {sessions.map(s => (
+                        <div key={s.id} className="session-item" onClick={() => resumeChat(s.id)}>
+                          <div className="session-info">
+                            <span className="session-title">{s.title}</span>
+                            <span className="session-time">{new Date(s.timestamp).toLocaleDateString()}</span>
+                          </div>
+                          <button className="session-resume">Resume</button>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-              )
-            ))}
-            {isTyping && (
-              <div className="message bot typing-indicator">
-                Bob is thinking
-                <span className="typing-dot"></span>
-                <span className="typing-dot"></span>
-                <span className="typing-dot"></span>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          <form className="chat-footer" onSubmit={handleSend}>
-            {/* ✅ Pending cards staging area */}
-            {pendingCards.length > 0 && (
-              <div className="pending-cards">
-                {pendingCards.map(card => (
-                  <div key={card.id} className="pending-card">
-                    <span className="pending-card-icon">📄</span>
-                    <div className="pending-card-info">
-                      <span className="pending-card-title">{card.title}</span>
-                      <span className="pending-card-preview">{card.preview}</span>
-                    </div>
-                    <button
-                      type="button"
-                      className="pending-card-remove"
-                      onClick={() => removePendingCard(card.id)}
-                      title="Remove"
-                    >
-                      <X size={13} />
-                    </button>
+            ) : (
+              <>
+                {messages.map((msg) => (
+                  <div key={msg.id} className={`message ${msg.role} ${msg.type === 'note-card-message' ? 'note-card-message' : ''}`}>
+                    {msg.type === 'note-card-message' ? (
+                      <>
+                        {msg.cards.map((card, i) => (
+                          <div key={i} className="note-card-bubble">
+                            <span className="note-card-icon">📄</span>
+                            <div className="note-card-info">
+                              <span className="note-card-title">{card.title}</span>
+                              <span className="note-card-preview">{card.preview}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {msg.text && <p className="note-card-user-text">{msg.text}</p>}
+                      </>
+                    ) : (
+                      <>
+                        {msg.role === 'bot' ? (
+                          <>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                            {msg.canSave !== false && (
+                              <button 
+                                className="save-advice-btn"
+                                onClick={() => saveToNotebook(msg.text, msg.title)}
+                                title="Save to Notebook"
+                              >
+                                <Save size={14} /> Save to Notebook
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          msg.text
+                        )}
+                      </>
+                    )}
                   </div>
                 ))}
-              </div>
+                {isTyping && (
+                  <div className="message bot typing-indicator">
+                    Bob is thinking
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </>
             )}
+          </div>
 
-            <div className="chat-input-wrapper">
-              <input
-                type="text"
-                className="chat-input"
-                placeholder={pendingCards.length > 0 ? "Add a message or just send..." : "Record your practice log..."}
-                value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="chat-send-btn"
-                disabled={isTyping || (!inputVal.trim() && pendingCards.length === 0)}
-              >
-                <Send size={18} />
-              </button>
-            </div>
-          </form>
+          {currentSessionId && (
+            <form className="chat-footer" onSubmit={handleSend}>
+              {pendingCards.length > 0 && (
+                <div className="pending-cards">
+                  {pendingCards.map(card => (
+                    <div key={card.id} className="pending-card">
+                      <span className="pending-card-icon">📄</span>
+                      <div className="pending-card-info">
+                        <span className="pending-card-title">{card.title}</span>
+                      </div>
+                      <button type="button" className="pending-card-remove" onClick={() => setPendingCards(prev => prev.filter(c => c.id !== card.id))}>
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="chat-input-wrapper">
+                <input
+                  type="text"
+                  className="chat-input"
+                  placeholder="Record your practice log..."
+                  value={inputVal}
+                  onChange={(e) => setInputVal(e.target.value)}
+                />
+                <button type="submit" className="chat-send-btn" disabled={isTyping}>
+                  <Send size={18} />
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
+        <AuthModal 
+          isOpen={isAuthOpen} 
+          onClose={() => setIsAuthOpen(false)}
+          onLogin={(userData) => setUser(userData)}
+          onSignup={(userData) => setUser(userData)}
+        />
       </div>
     </BrowserRouter>
   )

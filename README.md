@@ -1,88 +1,100 @@
 # RepLog. 🦾✨
-
 **The AI-Powered Coaching Journal for Elite Athletes and Creators.**
 
-RepLog is a high-performance web application designed for the **IBM WatsonX Hackathon**. It transforms raw practice logs into actionable coaching intelligence, powered by IBM's industry-leading Granite Foundation Models.
+RepLog is a high-performance web application designed for the **IBM WatsonX Hackathon 2026**. It transforms raw practice logs into actionable coaching intelligence, powered by IBM's industry-leading **Granite Foundation Models**.
 
 ---
 
-## 🚀 Key Features
+## 📽️ Project Overview
+In a world of data overflow, athletes and creators often struggle to turn "practice volume" into "performance progress." **RepLog** bridges this gap by acting as a 24/7 AI coach. By analyzing training logs, sensory feedback, and performance metrics, RepLog provides structured, psychological, and technical feedback to help users achieve their "Peak Rep."
+
+---
+
+## 🎨 Design Philosophy: Glassmorphism 2.0
+RepLog features a bespoke **Glassmorphic UI** designed for focus and flow:
+- **Ultra-Modern Aesthetics**: Translucent layers with dynamic blur effects and vibrant gradients.
+- **Micro-Animations**: Subtle transitions that provide tactile feedback without distraction.
+- **Mobile First**: Responsive architecture that works on the track, in the gym, or at the desk.
+
+---
+
+## 🚀 Core Features
 
 ### 🧠 IBM WatsonX "Bob" AI Coach
-- **Granite-Powered Insights**: Uses `ibm/granite-3-8b-instruct` to analyze practice nuances, physiological metrics, and psychological blocks.
-- **Semantic Auto-Titling**: AI automatically generates titles for your coaching sessions based on the first few logs (e.g., "5km Interval Strategy").
+*   **Granite-Powered Insights**: Leveraging `ibm/granite-3-8b-instruct` to perform domain-specific analysis across sports, coding, and music.
+*   **Structured Coaching Loop**: Every response follows a high-impact pattern:
+    *   🎉 **Small Wins**: Immediate positive reinforcement.
+    *   🔍 **Pattern Observation**: Identifying technical or mental trends.
+    *   🎯 **Next Practice Focus**: Concrete, actionable steps for the next session.
+*   **Semantic Auto-Titling**: Bob analyzes the start of your session and automatically generates a title to keep your history organized.
 
 ### 🧵 Multi-Session Architecture
-- **Parallel Threads**: Switch between coaching sessions for different goals without losing historical context.
-- **Full Control Manager**: High-fidelity interface to resume previous conversations, navigate back with a dedicated **Back Button**, or permanently **Delete** old threads.
+*   **Parallel Threads**: Maintain separate coaching sessions for "Cardio," "Strength," and "Skill Work" simultaneously.
+*   **Persistence**: For registered users, sessions are preserved across reloads with optimized local caching.
+*   **Session Management**: Full control to resume, jump back to history, or delete old sessions.
 
-### 📚 Integrated Markdown Notebook
-- **Save to Journal**: One-click "Save to Notebook" feature captures Bob's advice directly into a persistent, organized digital journal.
-- **Glassmorphic Editor**: A premium markdown-supported editor to refine your goals and track progress over time.
-
-### 📊 Notes Dashboard (NEW!)
-- **Visual Review Interface**: Interactive card-based layout displaying notebooks (parents) and pages (children) for easy content selection.
-- **Smart Selection**: Click a notebook to review all notes together, or click individual pages for focused feedback.
-- **Structured Coaching**: Bob provides three-part feedback: 🎉 Small Win, 🔍 Pattern/Observation, and 🎯 Next Practice Focus.
-- **Seamless Integration**: Modal overlay accessible from the Notebook page with full responsive design.
-
-### � Secure Identity & Trial System
-- **Guest Passes**: New users get a 3-chat trial with ephemeral storage to test the platform.
-- **Persistent Accounts**: Registered users get unlimited chats and permanent notebook storage.
-- **Data Privacy**: Guest history and journals are strictly transient and reset on page reload.
+### 📚 Professional Markdown Notebook
+*   **Drag-&-Drop Intelligence**: Seamlessly drag coaching advice or previous logs directly into your persistent journal.
+*   **Read-Only for Guests**: Default welcome guides are provided as read-only templates to ensure system integrity.
+*   **User-Scoped Storage**: Implements `prefix_userEmail` storage logic to ensure multi-user data isolation on shared machines.
 
 ---
 
-## 🛠️ Technical Stack
+## 🛠️ Technical Architecture
 
-- **Frontend**: React (Vite), Vanilla CSS (Custom Design System), Lucide Icons.
-- **Backend**: Node.js, Express.js.
-- **AI Infrastructure**: 
-  - **IBM WatsonX SDK**: `@ibm-cloud/watsonx-ai`
-  - **Foundation Model**: `ibm/granite-3-8b-instruct`
-  - **Prompt Engineering**: Structured JSON extraction with robust regex-based fallbacks.
+### Frontend: The High-Fidelity Interface
+- **React (Vite)**: Lightning-fast HMR and build times.
+- **Vanilla CSS**: Custom design system built from the ground up (no generic frameworks).
+- **Lucide Icons**: Crisp, medical-grade iconography for professional appearance.
+- **React-Markdown**: Full support for GFM-enhanced coaching summaries.
+
+### Backend: The WatsonX Pipeline
+- **Node.js / Express**: Secure proxy layer to mask API credentials.
+- **IBM WatsonX AI SDK**: Direct integration with `@ibm-cloud/watsonx-ai`.
+- **Robust Parsing Engine**: Custom regex-based JSON extractor that handles truncated or malformed LLM responses gracefully.
 
 ---
 
 ## 🏁 Getting Started
 
 ### 1. Prerequisites
-- Node.js (v18+)
-- IBM Cloud Account with WatsonX.ai access.
+- **Node.js** v18 or higher.
+- **IBM Cloud Account** with a WatsonX.ai project instance.
 
-### 2. Environment Setup
+### 2. Deployment Setup
 Create a `.env` file in the root directory:
 ```env
-IBM_CLOUD_API_KEY=YOUR_API_KEY
-IBM_PROJECT_ID=YOUR_PROJECT_ID
+IBM_CLOUD_API_KEY=your_ibm_api_key
+IBM_PROJECT_ID=your_watsonx_project_id
 PORT=3001
 ```
 
-### 3. Installation
+### 3. Installation & Launch
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Start the frontend
-npm run dev
-
-# Start the backend (in a separate terminal)
+# 2. Launch the AI Backend (Terminal 1)
 node server/index.js
+
+# 3. Launch the Frontend (Terminal 2)
+npm run dev
 ```
 
 ---
 
-## 📖 Documentation
-
-- **[Notes Dashboard Feature Guide](PRACTICE_MAP_README.md)**: Complete guide to using the Notes Dashboard
-- **[Notes Dashboard Implementation Plan](PRACTICE_MAP_PLAN.md)**: Technical architecture and design decisions
-- **[Notes Dashboard Test Guide](PRACTICE_MAP_TEST_GUIDE.md)**: Comprehensive testing checklist
-
----
-
-## 🔒 Security & Best Practices
-- **Credential Masking**: All API keys are managed exclusively via server-side environment variables and proxied through a secure Express bridge.
-- **Git Integrity**: The repository history has been sanitized to ensure no credentials were ever exposed.
+## 📖 Feature Guides
+- 📂 **[App Architecture](src/App.jsx)**: Central state and session management.
+- 📂 **[AI Pipeline](server/index.js)**: IBM WatsonX integration and prompt engineering.
+- 📂 **[Notebook System](src/pages/Notebook.jsx)**: Persistent journaling and drag-drop logic.
 
 ---
-Created by **Team Vireon** for the IBM WatsonX Hackathon 2026. 🚀
+
+## 🏆 Hackathon Submission Notes
+- **Innovation**: Real-time conversion of unstructured practice logs into structured coaching plans.
+- **Reliability**: Implements robust error handling for AI inference and secure authentication workflows.
+- **Scalability**: Designed for multi-user expansion while maintaining strict data privacy via user-scoped storage.
+
+---
+Created with 🦾 by **Team Vireon** for the IBM WatsonX Hackathon 2026.
+"Optimize every rep. Log every gain."

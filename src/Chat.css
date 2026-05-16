@@ -213,3 +213,180 @@
   cursor: not-allowed;
   transform: none;
 }
+
+
+/* Drop zone highlight */
+.chat-drawer[data-dragging="true"] {
+  border-left: 1px solid rgba(191, 64, 255, 0.6);
+  background: rgba(191, 64, 255, 0.05);
+}
+
+/* Note Card Bubble */
+.note-card-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  max-width: 90%;
+  cursor: default;
+}
+
+.note-card-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.note-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+.note-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-card-preview {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pending cards staging area (above input) */
+.pending-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--glass-border);
+  margin-bottom: 0.5rem;
+}
+
+.pending-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  position: relative;
+}
+
+.pending-card-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.pending-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.pending-card-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pending-card-preview {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pending-card-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+  margin-top: 1px;
+}
+
+.pending-card-remove:hover {
+  color: #ff4d4d;
+}
+
+/* Sent note card message in chat history */
+.note-card-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 90%;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  align-self: flex-end;
+}
+
+.note-card-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, rgba(0, 113, 227, 0.2), rgba(191, 64, 255, 0.2));
+  border: 1px solid rgba(191, 64, 255, 0.3);
+  border-radius: 16px;
+  border-bottom-right-radius: 4px;
+  padding: 0.75rem 1rem;
+}
+
+.note-card-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.note-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  overflow: hidden;
+}
+
+.note-card-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.note-card-preview {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-card-user-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(0, 113, 227, 0.2), rgba(191, 64, 255, 0.2));
+  border: 1px solid rgba(191, 64, 255, 0.3);
+  border-radius: 16px;
+  border-bottom-right-radius: 4px;
+  padding: 0.75rem 1rem;
+}

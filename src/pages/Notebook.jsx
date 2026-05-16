@@ -17,6 +17,22 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   const [isNotesDashboardOpen, setIsNotesDashboardOpen] = useState(false);
   const renameRef = useRef(null);
   const dragNodeRef = useRef(null);
+  const dragOverPageIdRef = useRef(null);
+
+  // Helper for highlighting search matches
+  const HighlightText = ({ text, query }) => {
+    if (!query) return <span>{text}</span>;
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return (
+      <span>
+        {parts.map((part, i) => 
+          part.toLowerCase() === query.toLowerCase() 
+            ? <mark key={i} className="nb-search-highlight">{part}</mark> 
+            : part
+        )}
+      </span>
+    );
+  };
 
   const activePage = notebooks
     .flatMap(nb => nb.pages)
@@ -423,7 +439,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
                     setRenameValue(page.title);
                   }}
                 >
-                  {page.title}
+                  <HighlightText text={page.title} query={searchQuery} />
                 </span>
               )}
 
@@ -562,7 +578,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
                       setRenameValue(nb.name);
                     }}
                   >
-                    {nb.name}
+                    <HighlightText text={nb.name} query={searchQuery} />
                   </span>
                 )}
 
@@ -634,14 +650,20 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
                 disabled={isGuest}
               />
             </div>
-            <textarea
-              className={`nb-editor-body ${isGuest ? 'disabled' : ''}`}
-              value={activePage.content}
-              onChange={e => updatePageContent(e.target.value)}
-              placeholder="Start writing... (Markdown supported)"
-              spellCheck={false}
-              readOnly={isGuest}
-            />
+            {searchQuery ? (
+              <div className="nb-editor-body nb-highlight-view">
+                <HighlightText text={activePage.content} query={searchQuery} />
+              </div>
+            ) : (
+              <textarea
+                className={`nb-editor-body ${isGuest ? 'disabled' : ''}`}
+                value={activePage.content}
+                onChange={e => updatePageContent(e.target.value)}
+                placeholder="Start writing... (Markdown supported)"
+                spellCheck={false}
+                readOnly={isGuest}
+              />
+            )}
           </>
         ) : (
           <div className="nb-empty-state">

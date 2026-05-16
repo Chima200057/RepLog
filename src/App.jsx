@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Bot, LogIn, LogOut, User, RefreshCw, MessageSquare, History, Save } from 'lucide-react'
+import { MessageCircle, X, Send, Bot, LogIn, LogOut, User, RefreshCw, MessageSquare, History, Save, Trash2, ChevronRight } from 'lucide-react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/HowItWorks'

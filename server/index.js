@@ -13,7 +13,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
 app.post('/api/chat', async (req, res) => {
-  const { message, history = [] } = req.body;
+  const { message, history = [], practiceMapMode = false } = req.body;
 
   if (!process.env.IBM_CLOUD_API_KEY || !process.env.IBM_PROJECT_ID) {
     return res.json({
@@ -28,12 +28,33 @@ app.post('/api/chat', async (req, res) => {
       authenticator: new IamAuthenticator({ apikey: process.env.IBM_CLOUD_API_KEY })
     });
     
-    let conversationContext = history.map(h => 
+    let conversationContext = history.map(h =>
       h.role === 'user' ? `<|user|>\n${h.text}` : `<|assistant|>\n${h.text}`
     ).join('\n');
 
-    const promptText = `<|system|>
-You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
+    // Use different system prompt for Practice Map mode
+    const systemPrompt = practiceMapMode ? `<|system|>
+You are IBM Bob, a supportive AI practice coach analyzing practice notes from the Practice Map.
+
+Structure your response in EXACTLY three sections with these emoji headers:
+
+🎉 Small Win: Acknowledge one specific positive element from their practice notes (2-3 sentences)
+
+🔍 Pattern/Observation: Identify one meaningful pattern, insight, or trend across their notes (2-3 sentences)
+
+🎯 Next Practice Focus: Suggest one specific, actionable next step they should focus on (2-3 sentences)
+
+IMPORTANT: Return your response ONLY in this JSON format:
+{
+  "title": "Practice Review",
+  "text": "Your response with the three emoji sections exactly as specified above"
+}
+
+${conversationContext}
+<|user|>
+Practice Notes: ${message}
+<|assistant|>` : `<|system|>
+You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach.
 Analyze the user's practice log and provide structured coaching feedback using Markdown.
 
 STYLE & FORMATTING RULES:
@@ -53,6 +74,8 @@ ${conversationContext}
 <|user|>
 Practice Log: ${message}
 <|assistant|>`;
+
+    const promptText = systemPrompt;
 
     const response = await watsonx.generateText({
       projectId: process.env.IBM_PROJECT_ID,

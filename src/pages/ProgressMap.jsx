@@ -121,7 +121,7 @@ function PreviewPanel({ node, onClose, onSendToBob }) {
 }
 
 // ─── Main ─────────────────────────────────────────────────────────
-export default function PracticeMap({ notebooks, setNotebooks, activePageId, setActivePageId, isGuest, onSendToBob }) {
+export default function ProgressMap({ notebooks, setNotebooks, activePageId, setActivePageId, isGuest, onSendToBob }) {
   const [view, setView]                 = useState('map');
   const [selectedNode, setSelectedNode] = useState(null);
   const [zoom, setZoom]                 = useState(1);
@@ -269,7 +269,12 @@ export default function PracticeMap({ notebooks, setNotebooks, activePageId, set
     Object.keys(posRef.current).forEach(id => {
       if (!ids.has(id)) { delete posRef.current[id]; delete velRef.current[id]; }
     });
-  }, [notebooks]);
+    
+    // Start physics loop when view is 'map' and graph has nodes
+    if (view === 'map' && nodes.length > 0) {
+      startLoop();
+    }
+  }, [notebooks, view, buildGraph, startLoop]);
 
   // ── Physics loop ──────────────────────────────────────────────────
   const startLoop = useCallback(() => {
@@ -457,7 +462,7 @@ export default function PracticeMap({ notebooks, setNotebooks, activePageId, set
     <div className="pm-wrapper">
       <div className="pm-tab-bar">
         <button className={`pm-tab ${view === 'map'  ? 'active' : ''}`} onClick={() => setView('map')}>
-          <Map size={15} /> Practice Map
+          <Map size={15} /> Progress Map
         </button>
         <button className={`pm-tab ${view === 'list' ? 'active' : ''}`} onClick={() => setView('list')}>
           <List size={15} /> Notebook

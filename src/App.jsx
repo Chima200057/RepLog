@@ -5,7 +5,7 @@ import Home from './pages/Home'
 import HowItWorks from './pages/HowItWorks'
 import About from './pages/About'
 // import Notebook from './pages/Notebook'
-import PracticeMap from './pages/PracticeMap';
+import ProgressMap from './pages/ProgressMap';
 import AuthModal from './components/AuthModal'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -323,7 +323,7 @@ function App() {
             isGuest={!user}
           />} /> */}
           <Route path="/features" element={
-            <PracticeMap
+            <ProgressMap
               notebooks={notebooks}
               setNotebooks={setNotebooks}
               activePageId={activePageId}

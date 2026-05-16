@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './NotesDashboard.css';
 
-export default function PracticeMap({ isOpen, onClose, notebooks, setNotebooks, setActivePageId, isGuest }) {
+export default function NotesDashboard({ isOpen, onClose, notebooks, setNotebooks, setActivePageId, isGuest }) {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectionType, setSelectionType] = useState(null); // 'parent' | 'child'
   const [previewContent, setPreviewContent] = useState(null);

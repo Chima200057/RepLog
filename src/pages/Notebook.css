@@ -41,6 +41,23 @@
   color: var(--text-main);
 }
 
+.nb-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.practice-map-btn {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.practice-map-btn:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: scale(1.05);
+}
+
 /* Search */
 .nb-search {
   display: flex;

@@ -20,7 +20,13 @@ RepLog is a high-performance web application designed for the **IBM WatsonX Hack
 - **Save to Journal**: One-click "Save to Notebook" feature captures Bob's advice directly into a persistent, organized digital journal.
 - **Glassmorphic Editor**: A premium markdown-supported editor to refine your goals and track progress over time.
 
-### 🔐 Secure Identity & Trial System
+### 📊 Notes Dashboard (NEW!)
+- **Visual Review Interface**: Interactive card-based layout displaying notebooks (parents) and pages (children) for easy content selection.
+- **Smart Selection**: Click a notebook to review all notes together, or click individual pages for focused feedback.
+- **Structured Coaching**: Bob provides three-part feedback: 🎉 Small Win, 🔍 Pattern/Observation, and 🎯 Next Practice Focus.
+- **Seamless Integration**: Modal overlay accessible from the Notebook page with full responsive design.
+
+### � Secure Identity & Trial System
 - **Guest Passes**: New users get a 3-chat trial with ephemeral storage to test the platform.
 - **Persistent Accounts**: Registered users get unlimited chats and permanent notebook storage.
 - **Data Privacy**: Guest history and journals are strictly transient and reset on page reload.
@@ -63,6 +69,14 @@ npm run dev
 # Start the backend (in a separate terminal)
 node server/index.js
 ```
+
+---
+
+## 📖 Documentation
+
+- **[Notes Dashboard Feature Guide](PRACTICE_MAP_README.md)**: Complete guide to using the Notes Dashboard
+- **[Notes Dashboard Implementation Plan](PRACTICE_MAP_PLAN.md)**: Technical architecture and design decisions
+- **[Notes Dashboard Test Guide](PRACTICE_MAP_TEST_GUIDE.md)**: Comprehensive testing checklist
 
 ---
 

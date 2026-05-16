@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   BookOpen, Plus, Trash2, ChevronRight, ChevronDown,
-  FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft
+  FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft, Map
 } from 'lucide-react';
+import PracticeMap from '../components/PracticeMap';
 import './Notebook.css';
 
 export default function Notebook({ notebooks, setNotebooks, activePageId, setActivePageId, isGuest }) {
@@ -13,6 +14,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   const [collapsedPages, setCollapsedPages] = useState({});
   const [dragState, setDragState] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
+  const [isPracticeMapOpen, setIsPracticeMapOpen] = useState(false);
   const renameRef = useRef(null);
   const dragNodeRef = useRef(null);
 
@@ -485,9 +487,18 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
             <BookOpen size={18} />
             <span>Notebooks</span>
           </div>
-          <button className="nb-icon-btn" onClick={() => setSidebarOpen(false)} title="Close sidebar">
-            <X size={16} />
-          </button>
+          <div className="nb-header-actions">
+            <button
+              className="nb-icon-btn practice-map-btn"
+              onClick={() => setIsPracticeMapOpen(true)}
+              title="Open Notes Dashboard"
+            >
+              <Map size={16} />
+            </button>
+            <button className="nb-icon-btn" onClick={() => setSidebarOpen(false)} title="Close sidebar">
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         <div className="nb-search">
@@ -605,6 +616,15 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
           </div>
         )}
       </main>
+
+      <PracticeMap
+        isOpen={isPracticeMapOpen}
+        onClose={() => setIsPracticeMapOpen(false)}
+        notebooks={notebooks}
+        setNotebooks={setNotebooks}
+        setActivePageId={setActivePageId}
+        isGuest={isGuest}
+      />
     </div>
   );
 }

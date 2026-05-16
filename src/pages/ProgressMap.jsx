@@ -332,12 +332,8 @@ export default function ProgressMap({ notebooks, setNotebooks, activePageId, set
     Object.keys(posRef.current).forEach(id => {
       if (!ids.has(id)) { delete posRef.current[id]; delete velRef.current[id]; }
     });
-    
-    // Start physics loop when view is 'map' and graph has nodes
-    if (view === 'map' && nodes.length > 0) {
-      startLoop();
-    }
-  }, [notebooks, view, startLoop]);
+  }, [notebooks]);
+
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
   // ── Node drag ─────────────────────────────────────────────────────

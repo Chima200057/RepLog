@@ -35,7 +35,7 @@ function Home({ onOpenChat }) {
         </p>
         <div className="hero-actions">
           <button className="btn-primary" onClick={onOpenChat}>Consult Bob</button>
-          <Link to="/how-it-works" className="btn-secondary" style={{textDecoration: 'none', display: 'flex', alignItems: 'center'}}>See How It Works</Link>
+          <button className="btn-secondary">Watch Demo</button>
         </div>
       </section>
 

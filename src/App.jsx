@@ -62,7 +62,7 @@ function App() {
         <nav className="navbar">
           <Link to="/" className="nav-brand" style={{textDecoration: 'none'}}>RepLog.</Link>
           <div className="nav-links">
-            <Link to="/">Features</Link>
+            <Link to="/features">Features</Link>
             <Link to="/how-it-works">How it Works</Link>
             <Link to="/about">About IBM Bob</Link>
           </div>
@@ -72,6 +72,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home onOpenChat={() => setIsChatOpen(true)} />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/features" element={<div style={{padding: '10rem', textAlign: 'center', minHeight: '80vh'}}><h1>Features (Coming Soon)</h1></div>} />
           <Route path="/about" element={<div style={{padding: '10rem', textAlign: 'center', minHeight: '80vh'}}><h1>About IBM Bob (Coming Soon)</h1></div>} />
         </Routes>
 

@@ -34,14 +34,42 @@ const DEFAULT_NOTEBOOKS = [
 function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [inputVal, setInputVal] = useState('');
-  const [messages, setMessages] = useState([
-    { id: 1, role: 'bot', text: 'Hey there! I am Bob, your AI coach. How was your practice session today?', canSave: false }
-  ]);
+  
+  // Persistence: Load from localStorage
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('replog_chat');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, role: 'bot', text: 'Hey there! I am Bob, your AI coach. How was your practice session today?', canSave: false }
+    ];
+  });
+  
   const [isTyping, setIsTyping] = useState(false);
-  const [pendingCards, setPendingCards] = useState([]); // ✅ staged note cards
-  const [notebooks, setNotebooks] = useState(DEFAULT_NOTEBOOKS);
-  const [activePageId, setActivePageId] = useState(101);
+  const [pendingCards, setPendingCards] = useState([]); 
+  
+  const [notebooks, setNotebooks] = useState(() => {
+    const saved = localStorage.getItem('replog_notebooks');
+    return saved ? JSON.parse(saved) : DEFAULT_NOTEBOOKS;
+  });
+  
+  const [activePageId, setActivePageId] = useState(() => {
+    const saved = localStorage.getItem('replog_active_page');
+    return saved ? JSON.parse(saved) : 101;
+  });
+
   const messagesEndRef = useRef(null);
+
+  // Sync to local storage
+  useEffect(() => {
+    localStorage.setItem('replog_chat', JSON.stringify(messages));
+  }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem('replog_notebooks', JSON.stringify(notebooks));
+  }, [notebooks]);
+
+  useEffect(() => {
+    localStorage.setItem('replog_active_page', JSON.stringify(activePageId));
+  }, [activePageId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -81,10 +109,16 @@ function App() {
     setIsTyping(true);
 
     try {
+      // Send last 5 messages for context
+      const history = messages.slice(-5).map(m => ({ role: m.role, text: m.text }));
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: combinedText })
+        body: JSON.stringify({ 
+          message: combinedText,
+          history: history
+        })
       });
       const data = await response.json();
       setMessages(prev => [...prev, {

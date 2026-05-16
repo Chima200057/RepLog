@@ -13,7 +13,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
 app.post('/api/chat', async (req, res) => {
-  const { message } = req.body;
+  const { message, history = [] } = req.body;
 
   // 1. Check if user configured IBM Cloud credentials
   if (!process.env.IBM_CLOUD_API_KEY || !process.env.IBM_PROJECT_ID) {
@@ -29,11 +29,16 @@ app.post('/api/chat', async (req, res) => {
       authenticator: new IamAuthenticator({ apikey: process.env.IBM_CLOUD_API_KEY })
     });
     
-    // Construct prompt using official Granite 3 tags for better separation
+    // Construct conversational prompt
+    let conversationContext = history.map(h => 
+      h.role === 'user' ? `<|user|>\n${h.text}` : `<|assistant|>\n${h.text}`
+    ).join('\n');
+
     const promptText = `<|system|>
 You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
 Analyze the user's practice log and provide brief, encouraging, coaching-style feedback to help them improve.
 Use emojis sparingly (maximum 1-2 per response) to keep the tone clean and professional.
+${conversationContext}
 <|user|>
 Practice Log: ${message}
 <|assistant|>

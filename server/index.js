@@ -29,21 +29,46 @@ app.post('/api/chat', async (req, res) => {
       authenticator: new IamAuthenticator({ apikey: process.env.IBM_CLOUD_API_KEY })
     });
     
-    // Construct prompt
-    const promptText = `You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
+    // Construct prompt using official Granite 3 tags for better separation
+    const promptText = `<|system|>
+You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
 Analyze the user's practice log and provide brief, encouraging, coaching-style feedback to help them improve.
-
+<|user|>
 Practice Log: ${message}
+<|assistant|>
 Bob's Feedback:`;
 
     const response = await watsonx.generateText({
       projectId: process.env.IBM_PROJECT_ID,
-      modelId: 'ibm/granite-13b-chat-v2', 
+      modelId: 'ibm/granite-3-8b-instruct', 
       input: promptText,
-      parameters: { max_new_tokens: 200 }
+      parameters: { 
+        max_new_tokens: 400,
+        stop_sequences: ['Practice Log:', 'User:'] 
+      }
     });
 
-    res.json({ text: response.result.results[0].generated_text });
+    let text = response.result.results[0].generated_text;
+    
+    // Comprehensive cleanup logic
+    const stopSequences = [
+      'Practice Log:', 
+      'User:', 
+      "Bob's Feedback:", 
+      'Analyze the user\'s', 
+      '<|system|>', 
+      '<|user|>', 
+      '<|assistant|>'
+    ];
+    
+    stopSequences.forEach(seq => {
+      const index = text.indexOf(seq);
+      if (index !== -1) {
+        text = text.substring(0, index);
+      }
+    });
+
+    res.json({ text: text.trim() });
 
   } catch (error) {
     console.error('Error calling WatsonX:', error.message);

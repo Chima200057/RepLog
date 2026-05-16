@@ -10,11 +10,11 @@ RepLog is a high-performance web application designed for the **IBM WatsonX Hack
 
 ### 🧠 IBM WatsonX "Bob" AI Coach
 - **Granite-Powered Insights**: Uses `ibm/granite-3-8b-instruct` to analyze practice nuances, physiological metrics, and psychological blocks.
-- **Semantic Auto-Titling**: AI automatically generates titles for your coaching sessions based on the first few logs (e.g., "5km Interval Strategy", "Piano Chord Transition Focus").
+- **Semantic Auto-Titling**: AI automatically generates titles for your coaching sessions based on the first few logs (e.g., "5km Interval Strategy").
 
 ### 🧵 Multi-Session Architecture
-- **Parallel Threads**: Switch between coaching sessions for different goals (e.g., Weightlifting, Programming, Yoga) without losing historical context.
-- **Session Selector**: A clean interface to resume previous conversations or start fresh threads.
+- **Parallel Threads**: Switch between coaching sessions for different goals without losing historical context.
+- **Full Control Manager**: High-fidelity interface to resume previous conversations, navigate back with a dedicated **Back Button**, or permanently **Delete** old threads.
 
 ### 📚 Integrated Markdown Notebook
 - **Save to Journal**: One-click "Save to Notebook" feature captures Bob's advice directly into a persistent, organized digital journal.
@@ -22,8 +22,8 @@ RepLog is a high-performance web application designed for the **IBM WatsonX Hack
 
 ### 🔐 Secure Identity & Trial System
 - **Guest Passes**: New users get a 3-chat trial with ephemeral storage to test the platform.
-- **Persistent Accounts**: Registered users get unlimited chats and permanent notebook storage synced via local storage.
-- **Glassmorphic Auth**: Elegant sign-in/sign-up experience.
+- **Persistent Accounts**: Registered users get unlimited chats and permanent notebook storage.
+- **Data Privacy**: Guest history and journals are strictly transient and reset on page reload.
 
 ---
 
@@ -34,8 +34,7 @@ RepLog is a high-performance web application designed for the **IBM WatsonX Hack
 - **AI Infrastructure**: 
   - **IBM WatsonX SDK**: `@ibm-cloud/watsonx-ai`
   - **Foundation Model**: `ibm/granite-3-8b-instruct`
-  - **Orchestration**: Custom Regex-based JSON extraction for structured AI responses.
-- **Styling**: Premium Glassmorphism (Backdrop-filter, blurred layers, linear gradients).
+  - **Prompt Engineering**: Structured JSON extraction with robust regex-based fallbacks.
 
 ---
 
@@ -69,7 +68,7 @@ node server/index.js
 
 ## 🔒 Security & Best Practices
 - **Credential Masking**: All API keys are managed exclusively via server-side environment variables and proxied through a secure Express bridge.
-- **Git Integrity**: The repository history has been sanitized to ensure no credentials or sensitive WatsonX identifiers were ever exposed.
+- **Git Integrity**: The repository history has been sanitized to ensure no credentials were ever exposed.
 
 ---
-Created by **Team Vireon** for the IBM WatsonX Hackathon 2026. 🚀
+Created by **Team RepLog** for the IBM WatsonX Hackathon 2026. 🚀

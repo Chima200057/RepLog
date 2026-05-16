@@ -199,7 +199,7 @@
   opacity: 1;
 }
 
-.nb-page-item span {
+.nb-page-label {
   flex: 1;
   white-space: nowrap;
   overflow: hidden;

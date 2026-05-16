@@ -274,7 +274,7 @@ export default function ProgressMap({ notebooks, setNotebooks, activePageId, set
     if (view === 'map' && nodes.length > 0) {
       startLoop();
     }
-  }, [notebooks, view, buildGraph, startLoop]);
+  }, [notebooks, view, startLoop]);
 
   // ── Physics loop ──────────────────────────────────────────────────
   const startLoop = useCallback(() => {

@@ -33,6 +33,7 @@ app.post('/api/chat', async (req, res) => {
     const promptText = `<|system|>
 You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
 Analyze the user's practice log and provide brief, encouraging, coaching-style feedback to help them improve.
+Use relevant emojis to make your responses more friendly and engaging.
 <|user|>
 Practice Log: ${message}
 <|assistant|>

@@ -7,6 +7,8 @@ import About from './pages/About'
 import './App.css'
 import './Chat.css'
 import Notebook from './pages/Notebook';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -158,7 +160,11 @@ function App() {
                 </div>
               ) : (
                 <div key={msg.id} className={`message ${msg.role}`}>
-                  {msg.text}
+                  {msg.role === 'bot' ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                  ) : (
+                    msg.text
+                  )}
                 </div>
               )
             ))}

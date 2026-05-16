@@ -121,6 +121,37 @@
   border-bottom-left-radius: 4px;
 }
 
+/* Markdown Styling within Bot Messages */
+.message.bot p {
+  margin: 0 0 0.75rem 0;
+}
+
+.message.bot p:last-child {
+  margin-bottom: 0;
+}
+
+.message.bot ul, .message.bot ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.message.bot li {
+  margin-bottom: 0.25rem;
+}
+
+.message.bot strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.message.bot code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+}
+
 .message.user {
   align-self: flex-end;
   background: linear-gradient(135deg, rgba(0, 113, 227, 0.2), rgba(191, 64, 255, 0.2));

@@ -124,7 +124,8 @@ function App() {
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'bot',
-        text: data.text || 'Error connecting to Bob.'
+        text: data.text || 'Error connecting to Bob.',
+        title: data.title || "Bob's Advice"
       }]);
     } catch (err) {
       setMessages(prev => [...prev, {
@@ -160,11 +161,15 @@ function App() {
     setPendingCards(prev => prev.filter(c => c.id !== id));
   };
 
-  const saveToNotebook = (text) => {
+  const saveToNotebook = (text, customTitle) => {
     const pageId = Date.now();
+    const displayTitle = customTitle 
+      ? `${customTitle} (${new Date().toLocaleDateString()})`
+      : `Bob's Advice (${new Date().toLocaleDateString()})`;
+
     const newPage = { 
       id: pageId, 
-      title: `Bob's Advice (${new Date().toLocaleDateString()})`, 
+      title: displayTitle, 
       content: text 
     };
     
@@ -247,7 +252,7 @@ function App() {
                       {msg.canSave !== false && (
                         <button 
                           className="save-advice-btn"
-                          onClick={() => saveToNotebook(msg.text)}
+                          onClick={() => saveToNotebook(msg.text, msg.title)}
                           title="Save to Notebook"
                         >
                           <Save size={14} /> Save to Notebook

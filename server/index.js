@@ -38,25 +38,46 @@ app.post('/api/chat', async (req, res) => {
 You are IBM Bob, a supportive, intelligent, and highly analytical AI practice coach. 
 Analyze the user's practice log and provide brief, encouraging, coaching-style feedback to help them improve.
 Use emojis sparingly (maximum 1-2 per response) to keep the tone clean and professional.
+
+IMPORTANT: Return your response in the following JSON format:
+{
+  "title": "A short 2-4 word summary of the topic (e.g. '5km Run Plan')",
+  "text": "Your full markdown-formatted coaching advice here"
+}
+
 ${conversationContext}
 <|user|>
 Practice Log: ${message}
-<|assistant|>
-Bob's Feedback:`;
+<|assistant|>`;
 
     const response = await watsonx.generateText({
       projectId: process.env.IBM_PROJECT_ID,
       modelId: 'ibm/granite-3-8b-instruct', 
       input: promptText,
       parameters: { 
-        max_new_tokens: 400,
-        stop_sequences: ['Practice Log:', 'User:'] 
+        max_new_tokens: 500,
+        stop_sequences: ['<|user|>', '<|system|>'] 
       }
     });
 
-    let text = response.result.results[0].generated_text;
+    let rawText = response.result.results[0].generated_text.trim();
     
-    // Comprehensive cleanup logic
+    try {
+      // Try to find JSON in the response
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return res.json({ 
+          text: parsed.text, 
+          title: parsed.title 
+        });
+      }
+    } catch (e) {
+      console.warn('Failed to parse JSON response, falling back to raw text');
+    }
+
+    // Comprehensive cleanup logic (fallback)
+    let text = rawText;
     const stopSequences = [
       'Practice Log:', 
       'User:', 
@@ -74,7 +95,7 @@ Bob's Feedback:`;
       }
     });
 
-    res.json({ text: text.trim() });
+    res.json({ text: text.trim(), title: 'Bob\'s Advice' });
 
   } catch (error) {
     console.error('Error calling WatsonX:', error.message);

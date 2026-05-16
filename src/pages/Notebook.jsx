@@ -121,8 +121,14 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
         if (nb.id !== notebookId) return nb;
         const pages = nb.pages;
         const idx = pages.findIndex(p => p.id === pageId);
-        const parentPage = [...pages.slice(0, idx)].reverse().find(p => p.parentId === null);
+        if (idx <= 0) return nb; // Can't indent first page
+        
+        // Find the page immediately above (previous sibling or parent's previous sibling)
+        const currentPage = pages[idx];
+        const parentPage = pages[idx - 1];
+        
         if (!parentPage) return nb;
+        
         const updatedPages = pages.map(p => {
           if (p.id === pageId) return { ...p, parentId: parentPage.id };
           if (p.id === parentPage.id) return { ...p, children: [...(p.children || []), pageId] };

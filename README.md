@@ -72,4 +72,4 @@ node server/index.js
 - **Git Integrity**: The repository history has been sanitized to ensure no credentials or sensitive WatsonX identifiers were ever exposed.
 
 ---
-Created by **Team RepLog** for the IBM WatsonX Hackathon 2026. 🚀
+Created by **Team Vireon** for the IBM WatsonX Hackathon 2026. 🚀

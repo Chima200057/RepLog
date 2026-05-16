@@ -136,6 +136,14 @@ function App() {
     setCurrentSessionId(id);
   };
 
+  const deleteSession = (e, id) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this session?")) {
+      setSessions(prev => prev.filter(s => s.id !== id));
+      if (currentSessionId === id) setCurrentSessionId(null);
+    }
+  };
+
   const handleLogout = () => {
     setUser(null);
     setCurrentSessionId(null);
@@ -323,7 +331,14 @@ function App() {
           onDrop={handleDrop}
         >
           <div className="chat-header">
-            <h2><Bot size={24} /> IBM Bob</h2>
+            <div className="chat-header-left">
+              {currentSessionId && (
+                <button className="back-btn" onClick={() => setCurrentSessionId(null)} title="Back to Sessions">
+                  <ChevronRight size={24} style={{ transform: 'rotate(180deg)' }} />
+                </button>
+              )}
+              <h2><Bot size={24} /> IBM Bob</h2>
+            </div>
             <button className="close-btn" onClick={() => setIsChatOpen(false)}>
               <X size={24} />
             </button>
@@ -362,7 +377,12 @@ function App() {
                             <span className="session-title">{s.title}</span>
                             <span className="session-time">{new Date(s.timestamp).toLocaleDateString()}</span>
                           </div>
-                          <button className="session-resume">Resume</button>
+                          <div className="session-actions">
+                            <button className="session-resume">Resume</button>
+                            <button className="session-delete" onClick={(e) => deleteSession(e, s.id)} title="Delete session">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>

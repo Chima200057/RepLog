@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, Send, Lock, BookOpen, FileText, CheckCircle, Save } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import './PracticeMap.css';
+import './NotesDashboard.css';
 
 export default function PracticeMap({ isOpen, onClose, notebooks, setNotebooks, setActivePageId, isGuest }) {
   const [selectedItems, setSelectedItems] = useState([]);

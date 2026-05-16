@@ -3,7 +3,7 @@ import {
   BookOpen, Plus, Trash2, ChevronRight, ChevronDown,
   FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft, Map
 } from 'lucide-react';
-import PracticeMap from '../components/PracticeMap';
+import NotesDashboard from '../components/NotesDashboard';
 import './Notebook.css';
 
 export default function Notebook({ notebooks, setNotebooks, activePageId, setActivePageId, isGuest }) {
@@ -617,7 +617,7 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
         )}
       </main>
 
-      <PracticeMap
+      <NotesDashboard
         isOpen={isPracticeMapOpen}
         onClose={() => setIsPracticeMapOpen(false)}
         notebooks={notebooks}

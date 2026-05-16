@@ -35,7 +35,7 @@ function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [inputVal, setInputVal] = useState('');
   const [messages, setMessages] = useState([
-    { id: 1, role: 'bot', text: 'Hey there! I am Bob, your AI coach. How was your practice session today?' }
+    { id: 1, role: 'bot', text: 'Hey there! I am Bob, your AI coach. How was your practice session today?', canSave: false }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [pendingCards, setPendingCards] = useState([]); // ✅ staged note cards
@@ -210,13 +210,15 @@ function App() {
                   {msg.role === 'bot' ? (
                     <>
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-                      <button 
-                        className="save-advice-btn"
-                        onClick={() => saveToNotebook(msg.text)}
-                        title="Save to Notebook"
-                      >
-                        <Save size={14} /> Save to Notebook
-                      </button>
+                      {msg.canSave !== false && (
+                        <button 
+                          className="save-advice-btn"
+                          onClick={() => saveToNotebook(msg.text)}
+                          title="Save to Notebook"
+                        >
+                          <Save size={14} /> Save to Notebook
+                        </button>
+                      )}
                     </>
                   ) : (
                     msg.text

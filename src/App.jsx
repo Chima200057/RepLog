@@ -374,7 +374,7 @@ function App() {
                         {msg.role === 'bot' ? (
                           <>
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
-                            {msg.canSave !== false && (
+                            {msg.canSave !== false && user && (
                               <button 
                                 className="save-advice-btn"
                                 onClick={() => saveToNotebook(msg.text, msg.title)}
@@ -382,6 +382,11 @@ function App() {
                               >
                                 <Save size={14} /> Save to Notebook
                               </button>
+                            )}
+                            {!user && msg.canSave !== false && (
+                              <div className="guest-save-blocked">
+                                <span>Sign up to save this to your notebook!</span>
+                              </div>
                             )}
                           </>
                         ) : (

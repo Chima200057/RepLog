@@ -4,7 +4,8 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/HowItWorks'
 import About from './pages/About'
-import Notebook from './pages/Notebook'
+// import Notebook from './pages/Notebook'
+import PracticeMap from './pages/PracticeMap';
 import AuthModal from './components/AuthModal'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -17,8 +18,10 @@ const DEFAULT_NOTEBOOKS = [
     name: 'Personal',
     expanded: true,
     pages: [
-      { id: 101, title: 'Welcome to RepLog', content: '# Welcome to RepLog\n\nStart writing your thoughts here...' },
-      { id: 102, title: 'Goals', content: '# Goals\n\n- [ ] Learn something new\n- [ ] Build something great' },
+      // { id: 101, title: 'Welcome to RepLog', content: '# Welcome to RepLog\n\nStart writing your thoughts here...' },
+      // { id: 102, title: 'Goals', content: '# Goals\n\n- [ ] Learn something new\n- [ ] Build something great' },
+      { id: 101, title: 'Welcome to RepLog', content: '...', parentId: null, children: [] },
+      { id: 102, title: 'Goals', content: '...', parentId: null, children: [] },
     ],
   },
   {
@@ -26,7 +29,8 @@ const DEFAULT_NOTEBOOKS = [
     name: 'Work',
     expanded: false,
     pages: [
-      { id: 201, title: 'Meeting Notes', content: '# Meeting Notes\n\nDate: ...' },
+      // { id: 201, title: 'Meeting Notes', content: '# Meeting Notes\n\nDate: ...' },
+      { id: 201, title: 'Meeting Notes', content: '# Meeting Notes\n\nDate: ...', parentId: null, children: [] },
     ],
   },
 ];
@@ -272,7 +276,8 @@ function App() {
       ? `${customTitle} (${new Date().toLocaleDateString()})`
       : `Bob's Advice (${new Date().toLocaleDateString()})`;
 
-    const newPage = { id: pageId, title: displayTitle, content: text };
+    // const newPage = { id: pageId, title: displayTitle, content: text };
+    const newPage = { id: pageId, title: displayTitle, content: text, parentId: null, children: [] };
     
     setNotebooks(prev =>
       prev.map(nb => nb.id === 1 ? { ...nb, expanded: true, pages: [...nb.pages, newPage] } : nb)
@@ -310,13 +315,32 @@ function App() {
         <Routes>
           <Route path="/" element={<Home onOpenChat={() => setIsChatOpen(true)} />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/features" element={<Notebook 
+          {/* <Route path="/features" element={<Notebook 
             notebooks={notebooks} 
             setNotebooks={setNotebooks} 
             activePageId={activePageId} 
             setActivePageId={setActivePageId} 
             isGuest={!user}
-          />} />
+          />} /> */}
+          <Route path="/features" element={
+            <PracticeMap
+              notebooks={notebooks}
+              setNotebooks={setNotebooks}
+              activePageId={activePageId}
+              setActivePageId={setActivePageId}
+              isGuest={!user}
+              onSendToBob={(note) => {
+                setIsChatOpen(true);
+                setPendingCards(prev => [...prev, {
+                  id: Date.now(),
+                  title: note.title,
+                  content: note.content,
+                  preview: note.content.slice(0, 120) + (note.content.length > 120 ? '...' : ''),
+                }]);
+              }}
+            />
+          } />
+
           <Route path="/about" element={<About />} />
         </Routes>
 

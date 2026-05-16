@@ -256,26 +256,6 @@ export default function ProgressMap({ notebooks, setNotebooks, activePageId, set
   const panRef   = useRef(null);
   const rafRef   = useRef(null);
 
-  useEffect(() => {
-    const { nodes, edges } = buildGraph();
-    graphRef.current = { nodes, edges };
-    nodes.forEach(n => {
-      if (!posRef.current[n.id]) {
-        posRef.current[n.id] = { x: n.defaultX, y: n.defaultY };
-        velRef.current[n.id] = { x: 0, y: 0 };
-      }
-    });
-    const ids = new Set(nodes.map(n => n.id));
-    Object.keys(posRef.current).forEach(id => {
-      if (!ids.has(id)) { delete posRef.current[id]; delete velRef.current[id]; }
-    });
-    
-    // Start physics loop when view is 'map' and graph has nodes
-    if (view === 'map' && nodes.length > 0) {
-      startLoop();
-    }
-  }, [notebooks, view, startLoop]);
-
   // ── Physics loop ──────────────────────────────────────────────────
   const startLoop = useCallback(() => {
     if (rafRef.current) return;
@@ -338,6 +318,26 @@ export default function ProgressMap({ notebooks, setNotebooks, activePageId, set
     rafRef.current = requestAnimationFrame(tick);
   }, []);
 
+
+  useEffect(() => {
+    const { nodes, edges } = buildGraph();
+    graphRef.current = { nodes, edges };
+    nodes.forEach(n => {
+      if (!posRef.current[n.id]) {
+        posRef.current[n.id] = { x: n.defaultX, y: n.defaultY };
+        velRef.current[n.id] = { x: 0, y: 0 };
+      }
+    });
+    const ids = new Set(nodes.map(n => n.id));
+    Object.keys(posRef.current).forEach(id => {
+      if (!ids.has(id)) { delete posRef.current[id]; delete velRef.current[id]; }
+    });
+    
+    // Start physics loop when view is 'map' and graph has nodes
+    if (view === 'map' && nodes.length > 0) {
+      startLoop();
+    }
+  }, [notebooks, view, startLoop]);
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
   // ── Node drag ─────────────────────────────────────────────────────

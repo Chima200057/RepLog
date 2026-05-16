@@ -16,8 +16,8 @@ function HowItWorks() {
           <div className="hiw-step" style={{ width: '100%', flexDirection: 'row', alignItems: 'flex-start', gap: '2rem', padding: '2.5rem' }}>
             <div className="step-number" style={{ flexShrink: 0 }}><Layers size={24} /></div>
             <div className="step-content">
-              <h3>1. Frontend Logging & UI State</h3>
-              <p>The entire interface is built using <strong>React</strong> and <strong>Vanilla CSS</strong> featuring dynamic glassmorphism and real-time state management. As you record your practice nuances, struggles, or successes into the global Chat Drawer, the frontend actively buffers your history via <code>useState</code> hooks, maintaining complete conversation context persistently across all navigation pages.</p>
+              <h3>1. Frontend Logging & Session Context</h3>
+              <p>The interface is built using <strong>React</strong> and <strong>Vanilla CSS</strong> featuring a high-fidelity glassmorphic design. RepLog uses an advanced <strong>Multi-Session Engine</strong> to track parallel coaching threads. Each session maintains independent message history, allowing you to toggle between different athletic goals without losing context.</p>
             </div>
           </div>
           
@@ -37,7 +37,7 @@ function HowItWorks() {
             <div className="step-number" style={{ flexShrink: 0 }}><BrainCircuit size={24} /></div>
             <div className="step-content">
               <h3>3. Foundation Model Execution (IBM Granite)</h3>
-              <p>The backend wraps the user's raw log in highly tuned prompt engineering instructions commanding the AI to act as a supportive, analytical coach. This prompt payload is securely transmitted over HTTPS directly to the <code>ibm/granite-13b-chat-v2</code> Enterprise Foundation Model residing within the <strong>watsonx.ai Runtime</strong> cluster, specifically configured for low-latency text-generation inference natively on IBM's cloud.</p>
+              <p>The backend wraps your practice log in a structured prompt-engineering template. Commands are securely transmitted to the <code>ibm/granite-3-8b-instruct</code> Granite model within the <strong>watsonx.ai Runtime</strong>. The model analyzes your metrics to generate both a semantic session title and targeted markdown coaching advice.</p>
             </div>
           </div>
 
@@ -46,8 +46,8 @@ function HowItWorks() {
           <div className="hiw-step" style={{ width: '100%', flexDirection: 'row', alignItems: 'flex-start', gap: '2rem', padding: '2.5rem' }}>
             <div className="step-number" style={{ flexShrink: 0 }}><Activity size={24} /></div>
             <div className="step-content">
-              <h3>4. Targeted Actionable Feedback</h3>
-              <p>The Granite model rapidly synthesizes the practice log context. Rather than providing generic chat completion, the structured prompt guarantees a high-yield coaching payload containing micro-goal suggestions, physiological corrections, and psychological reinforcement. The callback resolves back to the Express Node, which passes the JSON safely to the glassmorphic React render cycle.</p>
+              <h3>4. Authentication & Persistent Journaling</h3>
+              <p>For registered users, every piece of advice can be saved into a persistent <strong>Markdown Notebook</strong>. RepLog implements a secure <strong>Guest Trial System</strong> with message quotas and ephemeral storage, ensuring that high-value coaching data remains exclusive and protected while offering a seamless entry point for new users.</p>
             </div>
           </div>
 

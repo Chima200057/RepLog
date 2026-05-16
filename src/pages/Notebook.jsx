@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   BookOpen, Plus, Trash2, ChevronRight, ChevronDown,
-  FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft, LayoutDashboard
+  FileText, Search, X, Menu, GripVertical, ArrowRight, ArrowLeft, LayoutDashboard, Edit2
 } from 'lucide-react';
 import NotesDashboard from '../components/NotesDashboard';
 import './Notebook.css';
@@ -550,6 +550,16 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
                 <div className="nb-group-actions">
                   {!isGuest && (
                     <>
+                      <button 
+                        className="nb-icon-btn" 
+                        title="Rename notebook" 
+                        onClick={() => {
+                          setRenamingId(nb.id);
+                          setRenameValue(nb.name);
+                        }}
+                      >
+                        <Edit2 size={12} />
+                      </button>
                       <button className="nb-icon-btn" title="Add page" onClick={() => addPage(nb.id)}>
                         <Plus size={13} />
                       </button>

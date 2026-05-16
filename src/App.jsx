@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, Bot } from 'lucide-react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/HowItWorks'
+import About from './pages/About'
 import './App.css'
 import './Chat.css'
 
@@ -73,7 +74,7 @@ function App() {
           <Route path="/" element={<Home onOpenChat={() => setIsChatOpen(true)} />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/features" element={<div style={{padding: '10rem', textAlign: 'center', minHeight: '80vh'}}><h1>Features (Coming Soon)</h1></div>} />
-          <Route path="/about" element={<div style={{padding: '10rem', textAlign: 'center', minHeight: '80vh'}}><h1>About IBM Bob (Coming Soon)</h1></div>} />
+          <Route path="/about" element={<About />} />
         </Routes>
 
         {/* Global Floating Action Button */}

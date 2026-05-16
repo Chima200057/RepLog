@@ -47,12 +47,12 @@ function App() {
   });
 
   // -- SESSION MANAGEMENT --
-  const [activePageId, setActivePageId] = useState(() => {
+  const [sessions, setSessions] = useState(() => {
     const savedUser = localStorage.getItem('replog_user');
     const userObj = savedUser ? JSON.parse(savedUser) : null;
-    if (!userObj) return 101;
-    const saved = localStorage.getItem(`replog_active_page_${userObj.email}`);
-    return saved ? JSON.parse(saved) : 101;
+    if (!userObj) return [];
+    const saved = localStorage.getItem(`replog_sessions_${userObj.email}`);
+    return saved ? JSON.parse(saved) : [];
   });
   
   const [currentSessionId, setCurrentSessionId] = useState(null);
@@ -69,7 +69,10 @@ function App() {
   });
   
   const [activePageId, setActivePageId] = useState(() => {
-    const saved = localStorage.getItem('replog_active_page');
+    const savedUser = localStorage.getItem('replog_user');
+    const userObj = savedUser ? JSON.parse(savedUser) : null;
+    if (!userObj) return 101;
+    const saved = localStorage.getItem(`replog_active_page_${userObj.email}`);
     return saved ? JSON.parse(saved) : 101;
   });
 

@@ -26,9 +26,7 @@ const DEFAULT_NOTEBOOKS = [
   },
 ];
 
-export default function Notebook() {
-  const [notebooks, setNotebooks] = useState(DEFAULT_NOTEBOOKS);
-  const [activePageId, setActivePageId] = useState(101);
+export default function Notebook({ notebooks, setNotebooks, activePageId, setActivePageId }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [renamingId, setRenamingId] = useState(null);

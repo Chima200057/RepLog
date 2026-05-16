@@ -9,6 +9,27 @@ import './Chat.css'
 import Notebook from './pages/Notebook';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { Save } from 'lucide-react'
+
+const DEFAULT_NOTEBOOKS = [
+  {
+    id: 1,
+    name: 'Personal',
+    expanded: true,
+    pages: [
+      { id: 101, title: 'Welcome to RepLog', content: '# Welcome to RepLog\n\nStart writing your thoughts here...' },
+      { id: 102, title: 'Goals', content: '# Goals\n\n- [ ] Learn something new\n- [ ] Build something great' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Work',
+    expanded: false,
+    pages: [
+      { id: 201, title: 'Meeting Notes', content: '# Meeting Notes\n\nDate: ...' },
+    ],
+  },
+];
 
 function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -18,6 +39,8 @@ function App() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [pendingCards, setPendingCards] = useState([]); // ✅ staged note cards
+  const [notebooks, setNotebooks] = useState(DEFAULT_NOTEBOOKS);
+  const [activePageId, setActivePageId] = useState(101);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -103,6 +126,25 @@ function App() {
     setPendingCards(prev => prev.filter(c => c.id !== id));
   };
 
+  const saveToNotebook = (text) => {
+    const pageId = Date.now();
+    const newPage = { 
+      id: pageId, 
+      title: `Bob's Advice (${new Date().toLocaleDateString()})`, 
+      content: text 
+    };
+    
+    setNotebooks(prev =>
+      prev.map(nb =>
+        nb.id === 1 // Personal notebook
+          ? { ...nb, expanded: true, pages: [...nb.pages, newPage] }
+          : nb
+      )
+    );
+    setActivePageId(pageId);
+    alert('Advice saved to your Personal notebook!');
+  };
+
   return (
     <BrowserRouter>
       <div className="app-container">
@@ -119,7 +161,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home onOpenChat={() => setIsChatOpen(true)} />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/features" element={<Notebook />} />
+          <Route path="/features" element={<Notebook 
+            notebooks={notebooks} 
+            setNotebooks={setNotebooks} 
+            activePageId={activePageId} 
+            setActivePageId={setActivePageId} 
+          />} />
           <Route path="/about" element={<About />} />
         </Routes>
 
@@ -161,7 +208,16 @@ function App() {
               ) : (
                 <div key={msg.id} className={`message ${msg.role}`}>
                   {msg.role === 'bot' ? (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                    <>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+                      <button 
+                        className="save-advice-btn"
+                        onClick={() => saveToNotebook(msg.text)}
+                        title="Save to Notebook"
+                      >
+                        <Save size={14} /> Save to Notebook
+                      </button>
+                    </>
                   ) : (
                     msg.text
                   )}

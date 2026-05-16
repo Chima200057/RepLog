@@ -71,4 +71,4 @@ node server/index.js
 - **Git Integrity**: The repository history has been sanitized to ensure no credentials were ever exposed.
 
 ---
-Created by **Team RepLog** for the IBM WatsonX Hackathon 2026. 🚀
+Created by **Team Vireon** for the IBM WatsonX Hackathon 2026. 🚀

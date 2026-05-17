@@ -6,6 +6,12 @@ import {
 import NotesDashboard from '../components/NotesDashboard';
 import './Notebook.css';
 
+/**
+ * NOTEBOOK SYSTEM
+ * 
+ * A high-fidelity, hierarchical note-taking system featuring 
+ * nested pages, drag-and-drop organization, and recursive search.
+ */
 export default function Notebook({ notebooks, setNotebooks, activePageId, setActivePageId, isGuest }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,7 +25,11 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
   const dragNodeRef = useRef(null);
   const dragOverPageIdRef = useRef(null);
 
-  // Helper for highlighting search matches
+  /**
+   * SEARCH HIGHLIGHTER
+   * Recursively splits text around query matches to inject 
+   * <mark> tags for visual feedback.
+   */
   const HighlightText = ({ text, query }) => {
     if (!query) return <span>{text}</span>;
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
@@ -344,7 +354,11 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
     setDropTarget(null);
   };
 
-  // ── Render pages recursively ──
+  /**
+   * RECURSIVE TREE RENDERER
+   * Renders pages in a nested structure while preserving 
+   * drag-and-drop drop-zones between items.
+   */
   const renderPages = (pages, notebookId, parentId = null, depth = 0) => {
     return pages
       .filter(p => (p.parentId ?? null) === parentId)
@@ -488,6 +502,11 @@ export default function Notebook({ notebooks, setNotebooks, activePageId, setAct
       });
   };
 
+  /**
+   * HIERARCHICAL SEARCH FILTER
+   * If a page matches the query, we recursively include all of its 
+   * ancestors to ensure the tree structure remains intact.
+   */
   const filteredNotebooks = notebooks.map(nb => {
     if (!searchQuery) return nb;
 

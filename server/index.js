@@ -1,3 +1,10 @@
+/**
+ * REPLOG BACKEND SERVER
+ * 
+ * Orchestrates secure communication between the RepLog frontend and 
+ * the IBM WatsonX AI Runtime.
+ */
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -12,9 +19,14 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
+/**
+ * Main Chat Endpoint
+ * Proxies user prompts to IBM Granite-3 and applies custom parsing/cleaning.
+ */
 app.post('/api/chat', async (req, res) => {
   const { message, history = [], practiceMapMode = false } = req.body;
 
+  // Security Guard: Check for environment variables
   if (!process.env.IBM_CLOUD_API_KEY || !process.env.IBM_PROJECT_ID) {
     return res.json({
       text: "[MOCK RESPONSE] You said: '" + message + "'. Please configure your .env file with IBM_CLOUD_API_KEY and IBM_PROJECT_ID so I can connect to watsonx.ai!",
@@ -23,16 +35,22 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
+    // 1. Initialize WatsonX SDK with IBM Cloud IAM Authenticator
     const watsonx = WatsonXAI.newInstance({
       version: '2023-05-29',
       authenticator: new IamAuthenticator({ apikey: process.env.IBM_CLOUD_API_KEY })
     });
     
+    // 2. Format conversation history into chat-ml style context
     let conversationContext = history.map(h =>
       h.role === 'user' ? `<|user|>\n${h.text}` : `<|assistant|>\n${h.text}`
     ).join('\n');
 
-    // Use different system prompt for Practice Map mode
+    /**
+     * PROMPT ENGINEERING SYSTEM
+     * We use a dual-mode system prompt to switch between broad coaching 
+     * and structured "Practice Map" deep reviews.
+     */
     const systemPrompt = practiceMapMode ? `<|system|>
 You are IBM Bob, a supportive AI practice coach analyzing practice notes from the Practice Map.
 
@@ -77,6 +95,7 @@ Practice Log: ${message}
 
     const promptText = systemPrompt;
 
+    // 3. Invoke IBM Granite-3 8B Instruct model
     const response = await watsonx.generateText({
       projectId: process.env.IBM_PROJECT_ID,
       modelId: 'ibm/granite-3-8b-instruct', 
@@ -90,6 +109,11 @@ Practice Log: ${message}
     const rawText = response.result.results[0].generated_text.trim();
     let parsed = { title: "Bob's Feedback", text: rawText };
 
+    /**
+     * ADAPTIVE JSON PARSER
+     * LLMs occasionally fail to return perfect JSON or truncate responses.
+     * This multi-stage pipeline ensures valid data reaching the UI.
+     */
     try {
       // 1. Try standard parse
       parsed = JSON.parse(rawText);
@@ -100,7 +124,7 @@ Practice Log: ${message}
         try {
           parsed = JSON.parse(jsonMatch[0]);
         } catch (e2) {
-          // 3. Fallback: Manually extract text if JSON is truncated
+          // 3. Fallback: Manually extract text/title if JSON is malformed
           const textMatch = rawText.match(/"text":\s*"([\s\S]*)"/);
           const titleMatch = rawText.match(/"title":\s*"([^"]*)"/);
           
@@ -112,7 +136,10 @@ Practice Log: ${message}
       }
     }
 
-    // Secondary cleanup to strip AI "leakage"
+    /**
+     * CLEANUP PIPELINE
+     * Strip internal model markers and prompt tokens in case the model "leaked" them.
+     */
     const stopSequences = ['User:', "Bob's Feedback:", 'Analyze the user\'s', '<|system|>', '<|user|>', '<|assistant|>'];
     stopSequences.forEach(seq => {
       const index = parsed.text.indexOf(seq);

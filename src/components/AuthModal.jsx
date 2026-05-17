@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { X, User, Mail, Lock, ArrowRight } from 'lucide-react';
-import './AuthModal.css';
-
+/**
+ * AUTHENTICATION MODAL
+ * 
+ * Provides a glassmorphic interface for user sign-in and account creation.
+ * Handles conditional field rendering and profile hydration.
+ */
 export default function AuthModal({ isOpen, onClose, onLogin, onSignup }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -12,6 +14,11 @@ export default function AuthModal({ isOpen, onClose, onLogin, onSignup }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    /**
+     * MOCK AUTH FLOW
+     * Simulates profile creation. In production, this would trigger 
+     * a secure API call to a provider like Supabase or Firebase.
+     */
     if (isLogin) {
       onLogin({ name: email.split('@')[0], email });
     } else {

@@ -36,22 +36,40 @@ const DEFAULT_NOTEBOOKS = [
   },
 ];
 
+/**
+ * REPLOG CORE APPLICATION
+ * 
+ * Manages global state including authentication, multi-session chat, 
+ * and persistent notebook data.
+ */
 function App() {
+  // UI State
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [inputVal, setInputVal] = useState('');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   
-  // -- USER & AUTH STATE --
+  /**
+   * USER & AUTH STATE
+   * Hydrates the user profile from local storage.
+   */
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('replog_user');
     return saved ? JSON.parse(saved) : null;
   });
 
+  /**
+   * GUEST QUOTA ENGINE
+   * Tracks usage for non-registered users (capped at 3 messages).
+   */
   const [guestChatCount, setGuestChatCount] = useState(() => {
     return parseInt(localStorage.getItem('replog_guest_count') || '0');
   });
 
-  // -- SESSION MANAGEMENT --
+  /**
+   * MULTI-SESSION DISPATCHER
+   * Loads user-specific sessions based on the logged-in email.
+   * This ensures data isolation in shared-browser environments.
+   */
   const [sessions, setSessions] = useState(() => {
     const savedUser = localStorage.getItem('replog_user');
     const userObj = savedUser ? JSON.parse(savedUser) : null;
@@ -192,6 +210,7 @@ function App() {
       combinedText += (combinedText ? '\n\n' : '') + userText.trim();
     }
 
+    // 1. Log the user message locally
     const newUserMsg = { 
       id: Date.now(), 
       role: 'user', 
@@ -210,6 +229,11 @@ function App() {
     setPendingCards([]);
     setIsTyping(true);
 
+    /**
+     * AI PIPELINE INVOCATION
+     * Sends the current log along with a 5-message window of history 
+     * to ensure contextual awareness in the Granite-3 model.
+     */
     try {
       const history = updatedMessages.slice(-5).map(m => ({ role: m.role, text: m.text }));
 

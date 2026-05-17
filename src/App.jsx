@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/HowItWorks'
 import About from './pages/About'
+import Demo from './pages/Demo'
 // import Notebook from './pages/Notebook'
 import ProgressMap from './pages/ProgressMap';
 import AuthModal from './components/AuthModal'
@@ -342,6 +343,7 @@ function App() {
           } />
 
           <Route path="/about" element={<About />} />
+          <Route path="/demo" element={<Demo />} />
         </Routes>
 
         <button
